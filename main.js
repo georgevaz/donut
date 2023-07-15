@@ -9,6 +9,14 @@ let camera, scene, renderer, light;
 let raycaster, pointer;
 let loader, fontLoader;
 
+const posXMax = 5;
+const posYMax = 5;
+const posZMax = 4;
+
+const sceneDonuts = [];
+
+const allAxis = ['x', 'y', 'z'];
+
 const init = () => {
   if ( WebGL.isWebGLAvailable() ) {
     // Set Scene
@@ -43,25 +51,8 @@ const init = () => {
     loader = new GLTFLoader();
     fontLoader = new FontLoader();
   
-    fontLoader.load( '/public/fonts/droid/droid_sans_bold.typeface.json', function ( font ) {
-      const geometry = new TextGeometry( 'Click for donut', {
-        font,
-        size: 1,
-        height: 0.25,
-        curveSegments: 12,
-        bevelEnabled: true,
-        bevelThickness: .01,
-        bevelSize: .01,
-        bevelOffset: 0,
-        bevelSegments: 5
-      } );
-      geometry.center()
-      const material = new THREE.MeshPhongMaterial( { color: 0xeb8c34 } );
-      const text = new THREE.Mesh( geometry, material );
-      text.name = 'donutText'
-      scene.add(text)
-    } );
-  
+    loadFont();
+
     // Shoot a raycast
     window.addEventListener('click', onClick);
   
@@ -88,7 +79,6 @@ const update = () => {
     for (let i = 0; i < intersects.length; i ++) {
       if(intersects[i].object.name === 'donutText') {
         loadDonut();
-        console.log('load donut')
       }
     }
 
@@ -96,8 +86,35 @@ const update = () => {
     pointer.x = null;
     pointer.y = null;
   }
+  if(sceneDonuts.length > 0) {
+    for(let i = 0; i < sceneDonuts.length; i++){
+      let chosenAxis = allAxis[sceneDonuts[i]['axis']]
+      sceneDonuts[i].donut.rotation[chosenAxis] += .01;
+    }
+  }
   requestAnimationFrame( update );
   renderer.render( scene, camera );
+};
+
+const loadFont = () => {
+  fontLoader.load( './fonts/droid/droid_sans_bold.typeface.json', function ( font ) {
+    const geometry = new TextGeometry( 'Click for donut', {
+      font,
+      size: 1,
+      height: 0.25,
+      curveSegments: 12,
+      bevelEnabled: true,
+      bevelThickness: .01,
+      bevelSize: .01,
+      bevelOffset: 0,
+      bevelSegments: 5
+    });
+    geometry.center()
+    const material = new THREE.MeshPhongMaterial( { color: 0xeb8c34 } );
+    const text = new THREE.Mesh( geometry, material );
+    text.name = 'donutText'
+    scene.add(text)
+  });
 };
 
 // Donut looks like trash in three.js compared to the blender model
@@ -105,10 +122,15 @@ const loadDonut = () => {
   loader.load( './assets/donut.glb', ( gltf ) => {
     const donut = gltf.scene;
     donut.scale.set(10, 10, 10);
-    donut.position.x = (Math.round(Math.random()) ? 1 : -1);
-    donut.position.y = 0;
-    donut.position.z = 0;
-    donut.rotation.x = 180;
+    donut.position.x = posRandomizer(posXMax);
+    donut.position.y = posRandomizer(posYMax);
+    donut.position.z = posRandomizer(posZMax);
+
+    donut.rotation.x = Math.random() * Math.PI;
+    sceneDonuts.push({
+      'donut': donut,
+      'axis': Math.floor(Math.random() * allAxis.length),
+    });
     scene.add(donut);
   
   }, undefined, (error) => {
@@ -131,6 +153,12 @@ const onWindowResize = (e) => {
   camera.updateProjectionMatrix();
 
   renderer.setSize( window.innerWidth, window.innerHeight );
+};
+
+const posRandomizer = (max) => {
+  let num = Math.random() * max;
+  num *= Math.round(Math.random()) ? 1 : -1;
+  return num;
 };
 
 init();
