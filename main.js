@@ -18,36 +18,36 @@ const sceneDonuts = [];
 const allAxis = ['x', 'y', 'z'];
 
 const init = () => {
-  if ( WebGL.isWebGLAvailable() ) {
+  if (WebGL.isWebGLAvailable()) {
     // Set Scene
     scene = new THREE.Scene();
-    scene.background = new THREE.Color('pink')
+    scene.background = new THREE.Color('pink');
     
     // Set Camera
-    camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 5000 );
-    camera.position.set( 0, 0, 10 );
-    camera.lookAt( 0, 0, 0 );
+    camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 5000);
+    camera.position.set(0, 0, 10);
+    camera.lookAt(0, 0, 0);
     
     // Set Lighting
-    light = new THREE.DirectionalLight( 0xffffff, 1 );
-    light.position.set( 1, 1, 1 ).normalize();
-    scene.add( light );
+    light = new THREE.DirectionalLight(0xffffff, 1);
+    light.position.set(1, 1, 1).normalize();
+    scene.add(light);
     
     // Set Renderer
     renderer = new THREE.WebGLRenderer();
-    renderer.setSize( window.innerWidth, window.innerHeight );
+    renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.outputColorSpace = THREE.SRGBColorSpace;
-    document.body.appendChild( renderer.domElement );
+    document.body.appendChild(renderer.domElement);
   
     // Set Controls
-    // const controls = new OrbitControls( camera, renderer.domElement );
+    // const controls = new OrbitControls(camera, renderer.domElement);
     // controls.enableDamping = true;
   
     // Set Raycasting
     raycaster = new THREE.Raycaster();
     pointer = new THREE.Vector2();
   
-    // Loaders
+    // Set Loaders
     loader = new GLTFLoader();
     fontLoader = new FontLoader();
   
@@ -58,11 +58,11 @@ const init = () => {
     window.addEventListener('touchstart', onClick);
   
     // Handles resizing of window
-    window.addEventListener('resize', onWindowResize)
+    window.addEventListener('resize', onWindowResize);
 
   } else {
     const warning = WebGL.getWebGLErrorMessage();
-    document.getElementById( 'container' ).appendChild( warning );
+    document.getElementById('container').appendChild(warning);
   
   };
 };
@@ -72,16 +72,16 @@ const update = () => {
   // controls.update()
 
   // Update the picking ray with the camera and pointer position
-  raycaster.setFromCamera( pointer, camera );
+  raycaster.setFromCamera(pointer, camera);
 
   // Calculate objects intersecting the picking ray
-  const intersects = raycaster.intersectObjects( scene.children );
+  const intersects = raycaster.intersectObjects(scene.children);
   if(intersects.length > 0) {
     for (let i = 0; i < intersects.length; i ++) {
       if(intersects[i].object.name === 'donutText') {
         loadDonut();
-      }
-    }
+      };
+    };
 
     // Reset pointer
     pointer.x = null;
@@ -89,16 +89,16 @@ const update = () => {
   }
   if(sceneDonuts.length > 0) {
     for(let i = 0; i < sceneDonuts.length; i++){
-      let chosenAxis = allAxis[sceneDonuts[i]['axis']]
+      let chosenAxis = allAxis[sceneDonuts[i]['axis']];
       sceneDonuts[i].donut.rotation[chosenAxis] += .01;
     }
   }
-  requestAnimationFrame( update );
-  renderer.render( scene, camera );
+  requestAnimationFrame(update);
+  renderer.render(scene, camera);
 };
 
 const loadFont = () => {
-  fontLoader.load( './fonts/droid/droid_sans_bold.typeface.json', function ( font ) {
+  fontLoader.load('./fonts/droid/droid_sans_bold.typeface.json', function (font) {
     const geometry = new TextGeometry( 'Click for donut', {
       font,
       size: 1,
@@ -110,17 +110,17 @@ const loadFont = () => {
       bevelOffset: 0,
       bevelSegments: 5
     });
-    geometry.center()
-    const material = new THREE.MeshPhongMaterial( { color: 0xeb8c34 } );
-    const text = new THREE.Mesh( geometry, material );
-    text.name = 'donutText'
-    scene.add(text)
+    geometry.center();
+    const material = new THREE.MeshPhongMaterial({ color: 0xeb8c34 });
+    const text = new THREE.Mesh(geometry, material);
+    text.name = 'donutText';
+    scene.add(text);
   });
 };
 
 // Donut looks like trash in three.js compared to the blender model
 const loadDonut = () => {
-  loader.load( './assets/donut.glb', ( gltf ) => {
+  loader.load('./assets/donut.glb', (gltf) => {
     const donut = gltf.scene;
     donut.scale.set(10, 10, 10);
     donut.position.x = posRandomizer(posXMax);
@@ -133,11 +133,8 @@ const loadDonut = () => {
       'axis': Math.floor(Math.random() * allAxis.length),
     });
     scene.add(donut);
-  
   }, undefined, (error) => {
-  
-    console.error( error );
-  
+    console.error(error);
   });
 };
 
@@ -156,7 +153,7 @@ const onWindowResize = (e) => {
   camera.aspect = window.innerWidth / window.innerHeight;
   camera.updateProjectionMatrix();
 
-  renderer.setSize( window.innerWidth, window.innerHeight );
+  renderer.setSize(window.innerWidth, window.innerHeight);
 };
 
 const posRandomizer = (max) => {
@@ -167,6 +164,7 @@ const posRandomizer = (max) => {
 
 init();
 update();
+
 // Code reference dump
 
 // const createCube = () => {
