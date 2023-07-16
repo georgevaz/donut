@@ -55,7 +55,7 @@ const init = () => {
 
     // Shoot a raycast
     window.addEventListener('click', onClick);
-    window.addEventListener('touchstart', onClick);
+    window.addEventListener('touchend', onClick);
   
     // Handles resizing of window
     window.addEventListener('resize', onWindowResize)
