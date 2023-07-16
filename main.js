@@ -55,7 +55,7 @@ const init = () => {
 
     // Shoot a raycast
     window.addEventListener('click', onClick);
-    window.addEventListener('touchend', onClick);
+    window.addEventListener('mousedown', onClick);
   
     // Handles resizing of window
     window.addEventListener('resize', onWindowResize)
@@ -142,11 +142,14 @@ const loadDonut = () => {
 };
 
 const onClick = (e) => {
+  // check for click or touches
+  const x = e.clientX || e.touches[0].clientX;
+  const y = e.clientY || e.touches[0].clientY;
   
   // calculate pointer position in normalized device coordinates
   // (-1 to +1) for both components
-  pointer.x = ( e.clientX / window.innerWidth ) * 2 - 1;
-  pointer.y = - ( e.clientY / window.innerHeight ) * 2 + 1;
+  pointer.x = (x / window.innerWidth) * 2 - 1;
+  pointer.y = - (y / window.innerHeight) * 2 + 1;
 };
 
 const onWindowResize = (e) => {
